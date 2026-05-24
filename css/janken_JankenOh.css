@@ -68,8 +68,8 @@ h2 {
 /* 開発中ラベルの調整 */
 .dev-lock-overlay {
     position: absolute;
-    top: -3px;
-    right: 190px;
+    top: -5px;
+    right: 170px;
     width: 385px;
     height: 60px;
     background-color: rgba(0, 0, 0, 0.75);
