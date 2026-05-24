@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
 
 <style>
-/* 超必殺スロットのピコピコ明滅 */
+/* 超必殺スロットの明滅 */
 @keyframes pikopiko-glow {
     0% { box-shadow: 0 0 5px #ffcc00, inset 0 0 5px #ffcc00; background-color: #aa8800; color: #000; }
     50% { box-shadow: 0 0 25px #fff700, inset 0 0 15px #fff700; background-color: #ffcc00; color: #fff; text-shadow: 0 0 5px #000; }
@@ -363,6 +363,9 @@ $("#mode1").on("click", function() {
   setTimeout(function() {
     $("#opening_screen").hide();
     $("#game-screen").show();
+
+    $("#game-message").text("左下の山札をクリックして、最初のカードを引きましょう！");
+    
     // 💡 リセット後の再戦時にもclickイベントがバインドされるようここで再設定
     $("#main-deck").off("click").on("click", function() {
         let usedNormalSlots = $(".player-cards-zone .card-slot:not(#player-ex-slot)").filter(function() {
@@ -372,8 +375,8 @@ $("#mode1").on("click", function() {
             drawCards();
         }
     });
-    // 初回自動配布へ
-    drawCards();
+    // // 初回自動配布へ
+    // drawCards();
   }, 3300);
 });
 
@@ -790,8 +793,8 @@ $(document).on("click", "#sc-match-result-screen", function() {
 // 🛠️ 初回起動処理（※自動テストは削除し、純粋にタイトルからスタートさせます）
 // ==========================================
 // デフォルト状態ではタイトルのみを表示
-$("#title-screen").show();
-$("#game-screen").hide();
+// $("#title-screen").show();
+// $("#game-screen").hide();
 </script>
 </body>
 </html>

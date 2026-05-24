@@ -362,6 +362,10 @@ $("#mode1").on("click", function() {
   setTimeout(function() {
     $("#opening_screen").hide();
     $("#game-screen").show();
+
+        $("#game-message").text("左下の山札をクリックして、最初のカードを引きましょう！");
+
+
     // 💡 リセット後の再戦時にもclickイベントがバインドされるようここで再設定
     $("#main-deck").off("click").on("click", function() {
         let usedNormalSlots = $(".player-cards-zone .card-slot:not(#player-ex-slot)").filter(function() {
@@ -372,7 +376,7 @@ $("#mode1").on("click", function() {
         }
     });
     // 初回自動配布へ
-    drawCards();
+    // drawCards();
   }, 3300);
 });
 
