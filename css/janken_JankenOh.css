@@ -2,14 +2,13 @@
 body {
     background-color: #000000;
     font-family: 'DotGothic16', sans-serif;
-    margin: 0;
-    padding: 0;
+    margin: 0; 
 }
 
 .game-container {
     width: 900px;
     margin: 0 auto;
-    padding-top: 50px;
+    padding-top: 40px; 
     position: relative;
 }
 
@@ -17,9 +16,12 @@ h1 {
     text-align: center;
     font-size: 100px;
     color: #d8a024;
-    margin-top: 20px;
+    margin-top: 20px; 
     margin-bottom: 10px;
-    text-shadow: 4px 4px 0px #000, 8px 8px 0px #e43444;
+    /* シャドウ */
+    text-shadow: 
+        4px 4px 0px #000,
+        8px 8px 0px #e43444;
 }
 
 h2 {
@@ -27,8 +29,11 @@ h2 {
     font-size: 64px;
     color: #1136ca;
     margin-top: 0;
-    margin-bottom: 50px;
-    text-shadow: 4px 4px 0px #000, 8px 8px 0px #e43444;
+    margin-bottom: 50px; 
+    /* シャドウ */
+    text-shadow: 
+        4px 4px 0px #000,
+        8px 8px 0px #e43444;
 }
 
 .modeselect {
@@ -37,10 +42,11 @@ h2 {
     font-size: 35px;
 }
 
+/* 💡 タイトルモード選択エリア */
 .mode-case {
-    position: relative;
     text-align: center;
     margin-top: 30px;
+    position: relative;
     display: inline-flex;
     justify-content: center;
     width: 100%;
@@ -59,18 +65,23 @@ h2 {
     box-sizing: border-box;
 }
 
+#mode1 {
+    position: relative;
+    z-index: 10; 
+}
+
 .mode-case button:hover#mode1 {
     color: #ffffff;
     background-color: #e43444;
     border-color: #ffffff;
 }
 
-/* 開発中ラベルの調整 */
+/* 「開発中」ロック座布団 */
 .dev-lock-overlay {
     position: absolute;
-    top: -5px;
-    right: 188px;
-    width: 385px;
+    top: -2px;
+    left: 320px; 
+    width: 385px; 
     height: 60px;
     background-color: rgba(0, 0, 0, 0.75);
     border-radius: 4px;
@@ -79,10 +90,11 @@ h2 {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    pointer-events: none;
+    pointer-events: none; /* 下のボタンをクリックさせないガード */
     border: 2px dashed #555;
 }
 
+/* 開発中文字 */
 .dev-lock-text {
     color: #ff0033;
     font-size: 28px;
@@ -108,6 +120,7 @@ h2 {
     padding-top: 30px;
 }
 
+/* 始めの演出 */
 .opening-txt {
     font-family: 'DotGothic16', sans-serif;
     font-size: 300px;
@@ -158,6 +171,16 @@ h2 {
     100%    { opacity: 1; transform: scale(1); }
 }
 
+/* ゲーム画面 */
+.blink {
+    animation: text-blink 0.8s step-end infinite;
+}
+
+@keyframes text-blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0; }
+}
+
 #game-screen {
     color: #fff;
     padding: 5px 20px;
@@ -167,6 +190,7 @@ h2 {
     overflow: hidden;
 }
 
+/* 上側 */
 .enemy-side {
     border: 2px dashed #444;
     padding: 10px;
@@ -185,7 +209,9 @@ h2 {
     align-items: flex-start;
 }
 
-.mode-display { font-size: 24px; }
+.mode-display {
+    font-size: 24px;
+}
 
 .status-gauge-area {
     display: flex;
@@ -231,6 +257,7 @@ h2 {
     transform: translate(-8px, -6px);
 }
 
+/* 枠線の基本設定（白枠） */
 .gauge-border, .gauge-frame {
     width: 200px;
     height: 16px;
@@ -246,9 +273,15 @@ h2 {
     transition: width 0.3s ease-out;
 }
 
-.bar-hp { background-color: #00ff00; }
-.bar-jan { background-color: #ffcc00; }
+.bar-hp {
+    background-color: #00ff00;
+}
 
+.bar-jan {
+    background-color: #ffcc00;
+}
+
+/* 【中層】バトルエリア */
 .enemy-hands, .player-hands {
     display: flex;
     justify-content: center;
@@ -269,6 +302,7 @@ h2 {
     align-items: center;
 }
 
+/* 👤 【下層】自分の陣地 */
 .player-side {
     border: 2px dashed #444;
     padding: 10px;
@@ -305,6 +339,11 @@ h2 {
     transition: opacity 0.2s;
 }
 
+.player-meta {
+    display: flex;
+    justify-content: flex-end;
+}
+
 .player-cards-zone {
     display: flex;
     gap: 15px;
@@ -323,9 +362,10 @@ h2 {
     align-items: center;
 }
 
+/* 💬 【最下部】メッセージエリア */
 .message-zone {
     text-align: center;
-    margin-top: 15px;
+    margin-top: 15px; /* 💡 余白を詰めて画面内に収める */
     display: flex;
     justify-content: center;
 }
@@ -364,6 +404,7 @@ h2 {
     100% { box-shadow: 0 0 30px #ffcc00, 2px 2px 0px #000; }
 }
 
+/* 敵の光 */
 .cpu-hand-btn.active {
     background-color: #ffff00;
     border-color: #ffaa00;
@@ -377,6 +418,7 @@ h2 {
     100% { box-shadow: 0 0 30px #ff6666, 2px 2px 0px #000; }
 }
 
+/* ポップアップ */
 #card-popup {
     position: fixed;
     top: 0;
@@ -443,11 +485,11 @@ h2 {
 }
 
 .battle-zone {
-    margin: 15px 0;
+    margin: 15px 0; /* 💡 上下余白を詰める */
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 10px; /* 💡 パーツ間の隙間を限界まで最適化して横配列の崩れを完全防止 */
     height: auto;
     min-height: 200px;
     border: 2px dashed #444;
@@ -470,7 +512,7 @@ h2 {
 .hands-center-zone {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 30px; /* 💡 縦の重なりを防ぎつつ中央に集める */
 }
 
 .my-hand-btn:focus {
@@ -488,9 +530,10 @@ h2 {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 15px;
+    gap: 15px; /* 💡 詰めすぎず、離しすぎないベストな距離感 */
 }
 
+/* 💡 文字とはみ出しを完全クリアしたスマートサイズ */
 .battle-status-box {
     width: 90px;
     color: #ffffff;
@@ -501,8 +544,13 @@ h2 {
     gap: 6px;
 }
 
-.player-side .battle-status-box { margin-right: 12px; }
-.enemy-side .battle-status-box { margin-left: 12px; }
+/* 💡 修正：カードと攻撃力（ステータス）が近すぎたため、外側に「半文字分」寄せる余白を新設 */
+.player-side .battle-status-box {
+    margin-right: 12px; /* 自分側は左端に半文字寄せる */
+}
+.enemy-side .battle-status-box {
+    margin-left: 12px;  /* 相手側は右端に半文字寄せる */
+}
 
 .status-row {
     display: flex;
@@ -529,14 +577,82 @@ h2 {
     font-weight: bold;
 }
 
-.damage-zone-left {
-    left: -50px !important;
-}
-.damage-zone-right {
-    right: -50px !important;
-    left: auto !important;
+.battle-zone {
+    position: relative;
 }
 
+.battle-hands-display {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.battle-hands-display span {
+    position: absolute;
+    font-size: 150px !important;
+    line-height: 1;
+    z-index: 50;
+}
+
+#show-player-hand {
+    left: 270px;
+    bottom: 30px;
+    text-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.9), 
+        0 0 30px #ff6600, 
+        0 0 50px #f66a47;
+}
+
+#show-enemy-hand {
+    right: 270px;
+    bottom: 30px;
+    text-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.9), 
+        0 0 30px #ff0000, 
+        0 0 50px #990000;
+}
+
+.damage-popup-zone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    pointer-events: none;
+    display: table;
+    text-align: center;
+}
+
+.damage-num {
+    font-size: 80px;
+    font-weight: bold;
+    color: #ff3333;
+    text-shadow: 
+        4px 4px 0px #000,
+        -4px -4px 0px #000,
+        4px -4px 0px #000,
+        -4px 4px 0px #000,
+        0 0 30px #ff0000;
+    animation: damageAnim 1.8s ease-in-out forwards;
+}
+
+@keyframes damageAnim {
+    0%   { transform: scale(0.5); opacity: 0; }
+    15%  { transform: scale(1.2); opacity: 1; }
+    25%  { transform: scale(1.0); opacity: 1; }
+    50%  { opacity: 1; }
+    55%  { opacity: 0; }
+    60%  { opacity: 1; }
+    65%  { opacity: 0; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-50px); }
+}
+
+/* 🤖 敵の超必殺スロット用：禍々しい赤いピコピコ明滅 */
 @keyframes enemy-pikopiko-glow {
     0%   { box-shadow: 0 0 5px #ff3333, inset 0 0 5px #ff3333; background-color: #880000; }
     50%  { box-shadow: 0 0 25px #ff6666, inset 0 0 15px #ff6666; background-color: #ff3333; }
@@ -548,6 +664,7 @@ h2 {
     border: 3px solid #ff9999 !important;
 }
 
+/* 💡 02カード専用の蒼白きネオンオーラ効果 */
 @keyframes aura-float-02 {
     0%   { box-shadow: 0 0 10px #00d2ff, inset 0 0 4px #00d2ff; }
     100% { box-shadow: 0 0 25px #0066ff, inset 0 0 10px #0066ff; }
@@ -557,6 +674,7 @@ h2 {
     border: 2px solid #00d2ff !important;
 }
 
+/* 💡 ストⅡ風・ファミコン勝敗文字コンテナ */
 .sc-KO-container {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     z-index: 30000; background-color: rgba(0,0,0,0.5);
@@ -578,4 +696,15 @@ h2 {
 @keyframes sc-KO-flash {
     0% { transform: scale(1); }
     100% { transform: scale(1.03); }
+}
+
+/* ===================================================
+   💡 ダメージ数字の位置を微調整する部屋
+   =================================================== */
+.damage-zone-left {
+    left: -50px !important; /* 👑 ベストポジションを維持 */
+}
+.damage-zone-right {
+    right: -50px !important;
+    left: auto !important;
 }
