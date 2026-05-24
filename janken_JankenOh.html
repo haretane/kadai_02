@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<script src="js/jquery-2.1.3.min.js"></script>
+<link rel="stylesheet" href="css/janken_JankenOh.css">
+<title>Janken Oh</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+
+<style>
+/* 超必殺スロットのピコピコ明滅 */
+@keyframes pikopiko-glow {
+    0% { box-shadow: 0 0 5px #ffcc00, inset 0 0 5px #ffcc00; background-color: #aa8800; color: #000; }
+    50% { box-shadow: 0 0 25px #fff700, inset 0 0 15px #fff700; background-color: #ffcc00; color: #fff; text-shadow: 0 0 5px #000; }
+    100% { box-shadow: 0 0 5px #ffcc00, inset 0 0 5px #ffcc00; background-color: #aa8800; color: #000; }
+}
+.pikopiko-active {
+    animation: pikopiko-glow 0.8s infinite ease-in-out !important;
+    border: 3px solid #fff !important;
+}
+
+/* 超必殺選択ポップアップ全体のオーバーレイ */
+.ex-popup-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.9); z-index: 20000; display: flex;
+    justify-content: center; align-items: center; flex-direction: column;
+}
+.ex-popup-title {
+    color: #ffcc00; font-size: 32px; margin-bottom: 25px;
+    text-shadow: 0 0 10px #ff3300; font-weight: bold;
+}
+.ex-card-choices { display: flex; gap: 30px; margin-bottom: 30px; }
+.ex-choice-btn {
+    background: #111; border: 3px solid #555; border-radius: 8px;
+    padding: 10px; cursor: pointer; transition: transform 0.2s, border-color 0.2s;
+}
+.ex-choice-btn:hover {
+    transform: scale(1.05); border-color: #ffcc00;
+}
+.ex-choice-btn img { width: 110px; height: auto; display: block; border-radius: 4px; }
+
+/* カード確認・選択 of 2択エリアスタイル */
+.ex-confirm-panel {
+    display: none; flex-direction: column; align-items: center; gap: 20px;
+    background: rgba(20, 20, 20, 0.95); padding: 30px; border-radius: 12px;
+    border: 3px solid #ffcc00; box-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
+    z-index: 20005;
+}
+#ex-large-preview {
+    width: 240px; height: auto; border-radius: 12px;
+    box-shadow: 0 0 35px #ffcc00; display: block;
+    animation: card-float 2s infinite ease-in-out;
+}
+@keyframes card-float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+.ex-btn-row { display: flex; gap: 40px; margin-top: 10px; }
+.ex-final-btn {
+    font-family: 'DotGothic16', sans-serif; font-size: 24px; padding: 12px 30px;
+    border-radius: 8px; cursor: pointer; font-weight: bold; transition: transform 0.1s;
+}
+.ex-final-btn:active { transform: scale(0.95); }
+#ex-btn-select { background: #ffcc00; color: #000; border: 2px solid #fff; box-shadow: 0 0 15px #ffcc00; }
+#ex-btn-select:hover { background: #fff; box-shadow: 0 0 25px #fff; }
+#ex-btn-cancel { background: #444; color: #fff; border: 2px solid #888; }
+#ex-btn-cancel:hover { background: #666; }
+</style>
+</head>
+<body>
+
+<header>
+</header>
+
+<main>
+
+<div class="game-container">
+
+  <div id="title-screen">
+      <h1>ジャン 拳 王</h1>
+      <h2>JAN KEN OH</h2>
+      <p class="modeselect">モード選択</p>
+      <div class="mode-case">
+        <button id="mode1">入門</button>
+        <button id="mode2" disabled>中堅</button>
+        <button id="mode3" disabled>達人</button>
+        <button id="mode4" disabled>鬼</button>
+        <div class="dev-lock-overlay">
+            <span class="dev-lock-text">開 発 中</span>
+        </div>
+      </div>
+  </div>
+
+  <div id="opening_screen">
+    <div class="opening-container">
+      <span class="opening-txt left-text"></span>
+      <span class="opening-txt center-text">始め!!</span> 
+      <span class="opening-txt right-text"></span>
+    </div>
+  </div>
+
+  <div id="game-screen" style="display: none;">
+
+    <div class="enemy-side">
+          <div class="enemy-left-box">
+              <div class="mode-display">クラス：入門</div>
+              <div class="status-gauge-area">
+                  <div class="gauge-row">
+                      <span class="gauge-label">HP</span>
+                      <div class="gauge-border"><div class="gauge-bar bar-hp" style="width: 100%;"></div></div>
+                  </div>
+                  <div class="gauge-row">
+                      <span class="gauge-label">JAN</span>
+                      <div class="gauge-border"><div class="gauge-bar bar-jan" style="width: 0%;"></div></div>
+                  </div>
+              </div>
+          </div>
+          <div class="enemy-cards-zone">
+              <div class="card-slot">手札1</div>
+              <div class="card-slot">手札2</div>
+              <div class="card-slot">手札3</div>
+              <div class="card-slot" id="enemy-ex-slot" style="transition: all 0.3s;">超必殺</div>
+          </div>
+          <div class="enemy-deck-zone">
+              <div id="enemy-deck" class="enemy-deck-bundle">山札</div>
+          </div>
+    </div>
+
+    <div class="battle-zone">
+        <div class="slot-container player-side">
+            <div class="battle-status-box">
+                <div class="status-row"><span class="status-title">基礎</span><span class="status-value">20</span></div>
+                <div class="status-row"><span class="status-title">カード</span><span id="player-status-card" class="status-value">--</span></div>
+                <div class="status-row"><span class="status-title">属性</span><span id="player-status-element" class="status-element-bonus" style="color: #00ffcc;">±0</span></div>
+            </div>
+            <div id="player-battle-card" class="battle-card-slot"></div>
+        </div>
+
+        <div class="hands-center-zone">
+            <div class="enemy-hands">
+                <button class="cpu-hand-btn">✊</button>
+                <button class="cpu-hand-btn">✌️</button>
+                <button class="cpu-hand-btn">✋</button>
+            </div>
+            <div class="player-hands">
+                <button class="my-hand-btn">✊</button>
+                <button class="my-hand-btn">✌️</button>
+                <button class="my-hand-btn">✋</button>
+            </div>
+            <div class="battle-hands-display">
+                <span id="show-player-hand" style="display: none;"></span>
+                <span id="show-enemy-hand" style="display: none;"></span> 
+                <div id="damage-popup-player" class="damage-popup-zone damage-zone-left"></div>
+                <div id="damage-popup-enemy" class="damage-popup-zone damage-zone-right"></div>
+            </div>
+        </div>
+
+        <div class="slot-container enemy-side">
+            <div id="enemy-battle-card" class="battle-card-slot"></div>
+            <div class="battle-status-box">
+                <div class="status-row"><span class="status-title">基礎</span><span class="status-value">20</span></div>
+                <div class="status-row"><span class="status-title">カード</span><span id="enemy-status-card" class="status-value">？？</span></div>
+                <div class="status-row"><span class="status-title">属性</span><span id="enemy-status-element" class="status-element-bonus" style="color: #ff3333;">±0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="player-side">
+        <div class="player-deck-zone">
+            <div id="main-deck" class="deck-bundle"></div>
+        </div>
+        <div class="player-cards-zone">
+            <div class="card-slot">手札1</div>
+            <div class="card-slot">手札2</div>
+            <div class="card-slot">手札3</div>
+            <div class="card-slot" id="player-ex-slot" style="transition: all 0.3s;">超必殺</div>
+        </div>
+        <div class="player-left-box">
+            <div class="gauge-row">
+                <span class="gauge-label">HP</span>
+                <div class="gauge-frame">
+                    <div id="player-hp-bar" class="gauge-bar bar-hp" style="width: 100%;"></div>
+                </div>
+            </div>
+            <div class="gauge-row">
+                <span class="gauge-label">JAN</span>
+                <div class="gauge-frame">
+                    <div id="player-jan-bar" class="gauge-bar bar-jan" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="message-zone">
+        <p id="game-message"></p>
+    </div>
+
+  </div>
+</div>
+
+<div id="card-popup" style="display: none;">
+    <div class="popup-overlay"></div>
+    <div class="popup-content">
+        <img id="popup-img" src="" alt="カード詳細">
+        <div style="margin-top: 15px;">
+            <button id="use-card-btn">このカードを使う！</button>
+        </div>
+        <p class="popup-close-text">画面をクリックして閉じる</p>
+    </div>
+</div>
+
+<div id="ex-select-popup" class="ex-popup-overlay" style="display: none;">
+    <div class="ex-pick-stage">
+        <div class="ex-popup-title">どの最強の拳を錬成する……！？</div>
+        <div class="ex-card-choices">
+            <button class="ex-choice-btn" data-card="../img/Janken_Oh/G_03.png">
+                <img src="../img/Janken_Oh/G_03.png">
+            </button>
+            <button class="ex-choice-btn" data-card="../img/Janken_Oh/C_03.png">
+                <img src="../img/Janken_Oh/C_03.png">
+            </button>
+            <button class="ex-choice-btn" data-card="../img/Janken_Oh/P_03.png">
+                <img src="../img/Janken_Oh/P_03.png">
+            </button>
+        </div>
+    </div>
+
+    <div class="ex-confirm-panel">
+        <div class="ex-popup-title" style="font-size: 26px; margin-bottom: 10px;">この最強の拳を錬成しますか？</div>
+        <img id="ex-large-preview" src="" alt="大写しプレビュー">
+        <div class="ex-btn-row">
+            <button id="ex-btn-select" class="ex-final-btn">これを選ぶ</button>
+            <button id="ex-btn-cancel" class="ex-final-btn">考え直す</button>
+        </div>
+    </div>
+</div>
+
+<div id="sc-match-result-screen" class="sc-KO-container" style="display: none;">
+    <div id="sc-result-banner" class="sc-KO-text"></div>
+</div>
+
+<div id="battle-animation-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10000; justify-content: center; align-items: center; background-color: rgba(0,0,0,0.85);">
+    <div id="animation-container" style="position: relative; width: 600px; height: 500px; overflow: hidden; border: 4px solid #fff; box-shadow: 0 0 30px #fff;">
+        <img id="anim-frame-jpg" src="../img/Janken_Oh/action_01.jpg" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        <img id="anim-frame-png" src="../img/Janken_Oh/action_04.png" style="position: absolute; width: 100%; height: auto; top: 0; left: 0; display: none;">
+    </div>
+</div>
+
+</main>
+
+<footer></footer>
+
+<script>
+let openTimer = null;
+let checkMessageTimer = null;
+let enemyHands = [];
+let isExReady = false; 
+let tempChosenCardImg = ""; 
+
+// 相手の超必殺管理用フラグ・変数
+let isEnemyExReady = false;
+let enemyExCardImg = "";
+
+// 体力初期値設定
+let maxHP = 50;
+window.playerHP = maxHP;
+window.enemyHP = maxHP;
+let isGameOver = false; 
+
+// 💡 【追加】ゲーム全体を初期状態（ゲーム起動直後）に戻すシステムリセット関数
+function resetWholeGameToTitle() {
+    isGameOver = false;
+    window.playerHP = maxHP;
+    window.enemyHP = maxHP;
+    window.playerJAN = 0;
+    window.enemyJAN = 0;
+    isExReady = false;
+    isEnemyExReady = false;
+    enemyHands = [];
+
+    // 表示系を完全お掃除
+    $("#sc-match-result-screen").hide();
+    $("#game-screen").hide();
+    $("#player-battle-card, #enemy-battle-card").empty();
+    $("#player-status-card").text("--");
+    $("#enemy-status-card").text("？？");
+    $("#player-status-element, #enemy-status-element").text("±0").css("color", "#fff");
+    $(".enemy-side .bar-hp, #player-hp-bar").css("width", "100%");
+    $(".enemy-side .bar-jan, #player-jan-bar").css("width", "0%");
+    
+    // 手札枠のリセット
+    $(".player-cards-zone .card-slot, .enemy-cards-zone .card-slot").empty().text("").removeClass("aura-02");
+    $(".player-cards-zone .card-slot").eq(0).text("手札1");
+    $(".player-cards-zone .card-slot").eq(1).text("手札2");
+    $(".player-cards-zone .card-slot").eq(2).text("手札3");
+    $("#player-ex-slot").text("超必殺").removeClass("ready-to-awaken pikopiko-active").css({"background-color": "", "color": "", "border": "", "box-shadow": ""});
+    $(".enemy-cards-zone .card-slot").eq(0).text("手札1");
+    $(".enemy-cards-zone .card-slot").eq(1).text("手札2");
+    $(".enemy-cards-zone .card-slot").eq(2).text("手札3");
+    $("#enemy-ex-slot").text("超必殺").removeClass("enemy-pikopiko-active").css({"background-color": "", "color": "", "border": "", "box-shadow": ""});
+
+    // 山札の復活
+    $("#main-deck").css({"cursor": "pointer", "opacity": "1"}).off("click");
+
+    // 💡【ループの終着】タイトル画面をパッと再表示！
+    $("#title-screen").fadeIn(200);
+}
+
+// 拳の黄色い光（activeクラス）更新関数
+function updateHandGlowEffects() {
+    $(".my-hand-btn").removeClass("active");
+    $(".cpu-hand-btn").removeClass("active");
+
+    let hasG = false, hasC = false, hasP = false;
+    let enemyHasG = false, enemyHasC = false, enemyHasP = false;
+
+    $(".player-cards-zone .card-slot").each(function() {
+        if ($(this).text() !== "使用済") {
+            let src = $(this).find("img").attr("src") || "";
+            if (src.includes("G_")) hasG = true;
+            if (src.includes("C_")) hasC = true;
+            if (src.includes("P_")) hasP = true;
+        }
+    });
+
+    for (let i = 0; i < enemyHands.length; i++) {
+        let card = enemyHands[i];
+        if (card) {
+            if (card.includes("G_")) enemyHasG = true;
+            if (card.includes("C_")) enemyHasC = true;
+            if (card.includes("P_")) enemyHasP = true;
+        }
+    }
+
+    if (isEnemyExReady && enemyExCardImg) {
+        if (enemyExCardImg.includes("G_")) enemyHasG = true;
+        if (enemyExCardImg.includes("C_")) enemyHasC = true;
+        if (enemyExCardImg.includes("P_")) enemyHasP = true;
+    }
+
+    if (hasG) $(".my-hand-btn").eq(0).addClass("active");
+    if (hasC) $(".my-hand-btn").eq(1).addClass("active");
+    if (hasP) $(".my-hand-btn").eq(2).addClass("active");
+
+    if (enemyHasG) $(".cpu-hand-btn").eq(0).addClass("active");
+    if (enemyHasC) $(".cpu-hand-btn").eq(1).addClass("active");
+    if (enemyHasP) $(".cpu-hand-btn").eq(2).addClass("active");
+}
+
+// モード選択
+$("#mode1").on("click", function() {
+  $("#title-screen").hide();
+  $(".left-text").text("入");
+  $(".right-text").text("門");
+  $("#opening_screen").show();
+
+  setTimeout(function() {
+    $("#opening_screen").hide();
+    $("#game-screen").show();
+    // 💡 リセット後の再戦時にもclickイベントがバインドされるようここで再設定
+    $("#main-deck").off("click").on("click", function() {
+        let usedNormalSlots = $(".player-cards-zone .card-slot:not(#player-ex-slot)").filter(function() {
+            return $(this).text() === "使用済";
+        }).length;
+        if (usedNormalSlots === 3 || $(".player-cards-zone .card-slot img").length === 0) {
+            drawCards();
+        }
+    });
+    // 初回自動配布へ
+    drawCards();
+  }, 3300);
+});
+
+// ディール＆ドロー処理
+function drawCards() {
+  if (isGameOver) return; 
+
+  $("#main-deck").css({"cursor": "default", "opacity": "0.6"});
+  if (openTimer !== null) { clearTimeout(openTimer); openTimer = null; }
+  $("#game-message").text("カードを配っています…");
+
+  $(".my-hand-btn").removeClass("active");
+  $(".cpu-hand-btn").removeClass("active");
+  
+  enemyHands = []; 
+
+  // 自手札分配
+  $(".player-cards-zone .card-slot:not(#player-ex-slot)").each(function(index) {
+        let $card = $(this);
+        setTimeout(function() {
+            $card.text("").css("box-shadow", "none").removeClass("aura-02");
+            let cardList = [
+                "../img/Janken_Oh/G_01.png", "../img/Janken_Oh/G_02.png",
+                "../img/Janken_Oh/C_01.png", "../img/Janken_Oh/C_02.png",
+                "../img/Janken_Oh/P_01.png", "../img/Janken_Oh/P_02.png"
+            ];
+            let randomIndex = Math.floor(Math.random() * cardList.length);
+            let cardImage = cardList[randomIndex];
+            $card.html("<img src='" + cardImage + "' class='hand-card-img'>").css({"border": "none", "cursor": "pointer"});
+            
+            if (cardImage.includes("02")) {
+                $card.addClass("aura-02");
+            }
+        }, index * 300);
+  });
+
+  // 相手手札分配
+  $(".enemy-cards-zone .card-slot:not(#enemy-ex-slot)").each(function(index) {
+        let $enemyCard = $(this);
+        setTimeout(function() {
+            $enemyCard.text(""); 
+            let cardList = [
+                "../img/Janken_Oh/G_01.png", "../img/Janken_Oh/G_02.png",
+                "../img/Janken_Oh/C_01.png", "../img/Janken_Oh/C_02.png",
+                "../img/Janken_Oh/P_01.png", "../img/Janken_Oh/P_02.png"
+            ];
+            let randomIndex = Math.floor(Math.random() * cardList.length);
+            let enemyCardImage = cardList[randomIndex];
+            enemyHands.push(enemyCardImage);
+            $enemyCard.html("<img src='../img/Janken_Oh/ura.png' class='hand-card-img'>").css({"border": "none"});
+        }, index * 300);
+  });
+
+  setTimeout(function() {
+        $("#main-deck").css("opacity", "1");
+        updateHandGlowEffects();
+  }, 1000);
+
+  checkMessageTimer = setTimeout(function() {
+      if ($("#player-battle-card").html() !== "") return;
+      $("#game-message").text("手元の札をクリックしてチェック！！");
+  }, 3000);
+}
+
+// ポップアップ詳細
+let selectedSlotIndex = null;
+let selectedImgSrc = "";
+$(document).on("click", ".player-cards-zone .card-slot img", function() {
+  if (isGameOver) return;
+  if ($("#player-battle-card").html() !== "") return;
+  if ($(this).parent().attr("id") === "player-ex-slot" && !isExReady) return;
+
+  selectedSlotIndex = $(".player-cards-zone .card-slot").index($(this).parent());
+  selectedImgSrc = $(this).attr("src");
+  $("#popup-img").attr("src", selectedImgSrc);
+  $("#card-popup").fadeIn(200);
+});
+
+// ゲージ満タン時、4枚目の枠（超必殺枠）をクリックした時
+$(document).on("click", "#player-ex-slot.ready-to-awaken", function() {
+    if (isGameOver) return;
+    if ($("#player-battle-card").html() !== "") return; 
+    $(".ex-pick-stage").show();
+    $(".ex-confirm-panel").hide();
+    $("#ex-select-popup").fadeIn(200);
+});
+
+// カードを選択した時
+$(".ex-choice-btn").on("click", function() {
+    tempChosenCardImg = $(this).data("card"); 
+    $("#ex-large-preview").attr("src", tempChosenCardImg);
+    $(".ex-pick-stage").hide();
+    $(".ex-confirm-panel").css("display", "flex").hide().fadeIn(200);
+});
+
+// 「これを選ぶ」ボタンを押した時
+$("#ex-btn-select").on("click", function() {
+    $("#ex-select-popup").fadeOut(150);
+
+    $("#player-ex-slot")
+        .removeClass("ready-to-awaken pikopiko-active")
+        .html("<img src='" + tempChosenCardImg + "' class='hand-card-img'>")
+        .css({
+            "background-color": "transparent", 
+            "color": "transparent", 
+            "border": "none", 
+            "cursor": "pointer", 
+            "box-shadow": "0 0 25px #ffcc00"
+        });
+    
+    isExReady = true; 
+    updateHandGlowEffects(); 
+    $("#game-message").text("最強の拳が装填された！4枚目のカードをクリックして場に出そう！！");
+});
+
+// 「考え直す」ボタンを押した時
+$("#ex-btn-cancel").on("click", function() {
+    $(".ex-confirm-panel").hide();
+    $(".ex-pick-stage").fadeIn(150);
+});
+</script>
+
+<script>
+// カードを場に出す
+$("#use-card-btn").on("click", function(e) {
+  e.stopPropagation();
+  if (checkMessageTimer !== null) { clearTimeout(checkMessageTimer); checkMessageTimer = null; }
+  
+  $("#player-battle-card").html("<img src='" + selectedImgSrc + "' style='width:120px; height:auto; border-radius:6px; box-shadow: 0 0 15px #ffaa00;'>");
+  $("#enemy-battle-card").html("<img src='../img/Janken_Oh/ura.png' style='width:120px; height:auto; border-radius:6px; box-shadow: 0 0 15px #ff3333;'>");
+
+  let plusValue = 0;
+  if (selectedImgSrc.includes("01")) plusValue = 10;
+  else if (selectedImgSrc.includes("02")) plusValue = 20;
+  else if (selectedImgSrc.includes("03")) plusValue = 30;
+
+  $("#player-status-card").text("+" + plusValue);
+
+  if (selectedImgSrc.includes("G_")) $(".my-hand-btn").eq(0).focus();
+  if (selectedImgSrc.includes("C_")) $(".my-hand-btn").eq(1).focus();
+  if (selectedImgSrc.includes("P_")) $(".my-hand-btn").eq(2).focus();
+
+  let $targetSlot = $(".player-cards-zone .card-slot").eq(selectedSlotIndex);
+  $targetSlot.data("used-flag", "true").css({"cursor": "default", "box-shadow": "none"}).removeClass("aura-02");
+  
+  if ($targetSlot.attr("id") === "player-ex-slot") {
+      isExReady = false;
+      window.playerJAN = 0; 
+  }
+
+  $("#card-popup").fadeOut(150);
+  $("#game-message").text("繰り出す拳をクリックで勝負！※カード属性以外の拳も選べます");
+});
+
+$("#card-popup").on("click", function() { $(this).fadeOut(150); });
+
+// ✊✌️✋ 勝負解決メインロジック
+$(document).on("click", ".my-hand-btn", function() {
+    if (isGameOver) return; 
+    if ($("#player-battle-card").html() === "") {
+        $("#game-message").text("まずは手元のカードを選んで場に出してください！");
+        return;
+    }
+
+    let myHandNum = $(".my-hand-btn").index(this);
+
+    // CPUが一番強いカードをスキャンして選択
+    let chosenEnemyCardImg = "";
+    let chosenEnemyIndex = -1;
+    let isUsingEx = false;
+
+    if (isEnemyExReady) {
+        chosenEnemyCardImg = enemyExCardImg;
+        isUsingEx = true;
+    } else {
+        let maxPower = -1;
+        for (let i = 0; i < enemyHands.length; i++) {
+            let img = enemyHands[i];
+            let pValue = 0; 
+            if (img.includes("01")) pValue = 10;
+            if (img.includes("02")) pValue = 20;
+            if (img.includes("03")) pValue = 30;
+            let tPower = 20 + pValue;
+            
+            if (tPower > maxPower) {
+                maxPower = tPower;
+                chosenEnemyCardImg = img;
+                chosenEnemyIndex = i;
+            }
+        }
+        if (chosenEnemyIndex !== -1) {
+            enemyHands.splice(chosenEnemyIndex, 1);
+        }
+    }
+
+    // 選んだ最強カードの属性をそのまま手に
+    let enemyHandNum = 0; 
+    if (chosenEnemyCardImg.includes("C_")) {
+        enemyHandNum = 1; 
+    } else if (chosenEnemyCardImg.includes("P_")) {
+        enemyHandNum = 2; 
+    }
+
+    let tJan = 500, tKen = 250, tOura = 600, tGuwa = 1500;
+    let $pop = $("#battle-animation-popup").css("display", "flex");
+    let $jpg = $("#anim-frame-jpg");
+    let $png = $("#anim-frame-png");
+
+    $jpg.attr("src", "../img/Janken_Oh/action_01.jpg").show();
+    $png.hide();
+    $("#game-message").text("ジャン");
+
+    setTimeout(function() { $jpg.attr("src", "../img/Janken_Oh/action_02.jpg"); $("#game-message").text("ケン"); }, tJan);
+    setTimeout(function() { $jpg.attr("src", "../img/Janken_Oh/action_03.jpg"); $("#game-message").text("……ッッ！"); }, tJan + tKen);
+    setTimeout(function() {
+        $jpg.hide();
+        $png.css("top", "0px").show();
+        let containerHeight = $("#animation-container").height();
+        let imgHeight = $png.height() || 640;
+        $png.animate({ top: (containerHeight - imgHeight) + "px" }, tGuwa, "linear");
+        $("#game-message").text("クワッ！！");
+    }, tJan + tKen + tOura);
+
+    // ぽん♪ 判定処理
+    setTimeout(function() {
+        $pop.hide(); $png.stop().hide();
+        $(".enemy-hands, .player-hands").css({"opacity": 0, "pointer-events": "none"});
+
+        let handEmojis = ["✊", "✌️", "✋"];
+        $("#show-player-hand").text(handEmojis[myHandNum]).show();
+        $("#show-enemy-hand").text(handEmojis[enemyHandNum]).show();
+
+        let $enemyImg = $("<img>").attr("src", chosenEnemyCardImg).css({"width": "120px", "height": "auto", "border-radius": "6px", "box-shadow": "0 0 15px #ff3333"});
+        $("#enemy-battle-card").empty().append($enemyImg);
+
+        if (isUsingEx) {
+            $("#enemy-ex-slot").removeClass("enemy-pikopiko-active").empty().text("使用済").css({"color": "#444", "background-color": "transparent", "box-shadow": "none", "border": "2px solid #fff"});
+            isEnemyExReady = false;
+            window.enemyJAN = 0; 
+        } else {
+            $(".enemy-cards-zone .card-slot:not(#enemy-ex-slot)").filter(function() {
+                return $(this).text() !== "使用済" && $(this).find("img").length > 0;
+            }).first().empty().text("使用済").css({"color": "#444", "display": "flex", "justify-content": "center", "align-items": "center"});
+        }
+
+        // 相手側の「カード」単体補正を反映
+        let enemyPlusValue = 0;
+        if (chosenEnemyCardImg.includes("01")) enemyPlusValue = 10;
+        else if (chosenEnemyCardImg.includes("02")) enemyPlusValue = 20;
+        else if (chosenEnemyCardImg.includes("03")) enemyPlusValue = 30;
+        $("#enemy-status-card").text("+" + enemyPlusValue);
+
+        // 勝敗 ＆ 属性シンクロチェック
+        let jankenResult = (myHandNum - enemyHandNum + 3) % 3;
+        
+        let isPlayerElementMatch = false;
+        if (selectedImgSrc.includes("G_") && myHandNum === 0) isPlayerElementMatch = true;
+        if (selectedImgSrc.includes("C_") && myHandNum === 1) isPlayerElementMatch = true;
+        if (selectedImgSrc.includes("P_") && myHandNum === 2) isPlayerElementMatch = true;
+
+        let playerElementBonus = 0;
+        let enemyElementBonus = 0;
+
+        let playerJanAdd = 0;
+        let enemyJanAdd = 0;
+
+        if (jankenResult === 2) {
+            $("#game-message").text("ぽん♪ 属性相性で有利！");
+            playerJanAdd = 0; enemyJanAdd = 20;  
+
+            if (isPlayerElementMatch) {
+                playerElementBonus = 20;
+                $("#game-message").text("ぽん♪ カード属性と拳が完全シンクロ！攻撃力補正プラス２０！！");
+            } else {
+                $("#game-message").text("ぽん♪ じゃんけんには勝ったが、カード属性と違う拳のため補正はなし！");
+            }
+        } 
+        else if (jankenResult === 1) {
+            $("#game-message").text("ぽん♪ 属性相性で不利……！");
+            playerJanAdd = 20; enemyJanAdd = 0;  
+            enemyElementBonus = 20;
+            $("#game-message").text("ぽん♪ 相手にカード属性シンクロ補正プラス２０！！");
+        } 
+        else {
+            $("#game-message").text("ぽん♪ 属性相性は互角！補正はなし！");
+            playerJanAdd = 10; enemyJanAdd = 10;
+        }
+
+        $("#player-status-element").text(playerElementBonus > 0 ? "+" + playerElementBonus : "±0").css("color", playerElementBonus > 0 ? "#00ffcc" : "#fff");
+        $("#enemy-status-element").text(enemyElementBonus > 0 ? "+" + enemyElementBonus : "±0").css("color", enemyElementBonus > 0 ? "#ff3333" : "#fff");
+
+        // 最終トータル攻撃力の算出
+        let finalPlayerPower = 20 + parseInt($("#player-status-card").text().replace("+", "")) + playerElementBonus;
+        let finalEnemyPower = 20 + enemyPlusValue + enemyElementBonus;
+
+        // ダメージ計算
+        let damageToEnemy = finalPlayerPower - finalEnemyPower;
+        if (typeof window.playerHP === "undefined") window.playerHP = maxHP;
+        if (typeof window.enemyHP === "undefined") window.enemyHP = maxHP;
+        if (typeof window.playerJAN === "undefined") window.playerJAN = 0;
+        if (typeof window.enemyJAN === "undefined") window.enemyJAN = 0;
+
+        let targetSide = "";
+        let damageText = "";
+        if (damageToEnemy > 0) {
+            damageText = "-" + damageToEnemy; targetSide = "enemy";
+            window.enemyHP = Math.max(0, window.enemyHP - (damageToEnemy / 2));
+        } else if (damageToEnemy < 0) {
+            let actualDamage = Math.abs(damageToEnemy);
+            damageText = "-" + actualDamage; targetSide = "player";
+            window.playerHP = Math.max(0, window.playerHP - (actualDamage / 2));
+        } else {
+            damageText = "±0";
+        }
+
+        let $dmgDiv = $("<div class='damage-num'></div>").text(damageText);
+        let $targetArea = (targetSide === "player") ? $("#damage-popup-player") : $("#damage-popup-enemy");
+        $("#damage-popup-player, #damage-popup-enemy").empty();
+        $targetArea.html($dmgDiv);
+
+        if (window.playerJAN < 100) { window.playerJAN = Math.min(100, window.playerJAN + playerJanAdd); }
+        if (!isEnemyExReady) { window.enemyJAN = Math.min(100, window.enemyJAN + enemyJanAdd); }
+
+        $(".player-cards-zone .card-slot").each(function() {
+            if ($(this).data("used-flag") === "true") {
+                $(this).removeData("used-flag").empty().text("使用済");
+            }
+        });
+
+        // 🕒 1.8秒後にHP/JANゲージ減少・勝敗判定
+        setTimeout(function() {
+            $("#damage-popup-player, #damage-popup-enemy").empty();
+            
+            let playerHPPercent = (window.playerHP / maxHP) * 100;
+            let enemyHPPercent = (window.enemyHP / maxHP) * 100;
+            $(".enemy-side .bar-hp").css("width", enemyHPPercent + "%");
+            $("#player-hp-bar").css("width", playerHPPercent + "%");
+
+            $("#player-jan-bar").css("width", window.playerJAN + "%");
+            $(".enemy-side .bar-jan").css("width", window.enemyJAN + "%");
+
+            // ストⅡ式勝敗判定
+            if (window.playerHP <= 0 || window.enemyHP <= 0) {
+                isGameOver = true;
+                $(".enemy-hands, .player-hands").css({"opacity": 0, "pointer-events": "none"});
+                
+                if (window.enemyHP <= 0 && window.playerHP > 0) {
+                    $("#sc-result-banner").removeClass("sc-LOSE").addClass("sc-WIN").text("YOU WIN !!");
+                    $("#game-message").text("🏆 試合終了！おめでとう！！画面をクリックしてタイトル画面へ戻ります。");
+                } else if (window.playerHP <= 0 && window.enemyHP > 0) {
+                    $("#sc-result-banner").removeClass("sc-WIN").addClass("sc-LOSE").text("Lose...");
+                    $("#game-message").text("💀 試合終了！無念……！画面をクリックしてタイトル画面へ戻ります。");
+                } else {
+                    $("#sc-result-banner").removeClass("sc-WIN sc-LOSE").css("color", "#fff").text("DRAW");
+                    $("#game-message").text("🤝 同時KO！画面をクリックしてタイトル画面へ戻ります。");
+                }
+                
+                $("#sc-match-result-screen").fadeIn(300);
+                return; 
+            }
+
+            if (window.playerJAN >= 100 && !isExReady) {
+                $("#player-ex-slot").addClass("ready-to-awaken pikopiko-active").text("超必殺可");
+                $("#game-message").text("【JANゲージ満タン!!】4枚目のピコピコ光る枠を押して、最強の拳を錬成せよ！");
+            }
+            
+            if (window.enemyJAN >= 100 && !isEnemyExReady) {
+                let exTypes = ["../img/Janken_Oh/G_03.png", "../img/Janken_Oh/C_03.png", "../img/Janken_Oh/P_03.png"];
+                enemyExCardImg = exTypes[Math.floor(Math.random() * 3)]; 
+                isEnemyExReady = true;
+                $("#enemy-ex-slot").addClass("enemy-pikopiko-active").html("<img src='../img/Janken_Oh/ura.png' class='hand-card-img'>").css({"border": "none", "box-shadow": "0 0 15px #ff3333"});
+            }
+
+            // 次ラウンドへのリセット
+            setTimeout(function() {
+                $("#show-player-hand, #show-enemy-hand").hide().text("");
+                $("#player-battle-card, #enemy-battle-card").empty();
+                
+                $("#player-status-card").text("--");
+                $("#enemy-status-card").text("？？");
+                $("#player-status-element").text("±0").css("color", "#fff");
+                $("#enemy-status-element").text("±0").css("color", "#fff");
+
+                $(".enemy-hands, .player-hands").css({"opacity": 1, "pointer-events": "auto"});
+                
+                updateHandGlowEffects();
+
+                let usedNormalSlots = $(".player-cards-zone .card-slot:not(#player-ex-slot)").filter(function() {
+                    return $(this).text() === "使用済";
+                }).length;
+
+                if (usedNormalSlots === 3) {
+                    $("#main-deck").css({"cursor": "pointer", "opacity": "1"});
+                    $("#game-message").text("手札をすべて使い切った！左下の山札をクリックして、次のカードを引き直そう！！");
+                } else if (window.playerJAN >= 100 && !isExReady) {
+                    $("#game-message").text("ゲージ満タン！4枚目の「超必殺可」を押して最強カードを選ぼう！");
+                } else {
+                    $("#game-message").text("次のラウンドだ！手元に残っている次のカードを選んで場に出そう！");
+                }
+
+            }, 1500);
+
+        }, 1800);
+
+    }, tJan + tKen + tOura + tGuwa);
+});
+
+// 💡【修正】決着画面をクリックした時、ブラウザ全体のリロードではなく、タイトル画面に戻るように変更
+$(document).on("click", "#sc-match-result-screen", function() {
+    resetWholeGameToTitle();
+});
+
+// ==========================================
+// 🛠️ 初回起動処理（※自動テストは削除し、純粋にタイトルからスタートさせます）
+// ==========================================
+// デフォルト状態ではタイトルのみを表示
+// $("#title-screen").show();
+// $("#game-screen").hide();
+</script>
+</body>
+</html>

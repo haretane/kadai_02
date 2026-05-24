@@ -1,0 +1,581 @@
+/* 全体のフォントと背景色 */
+body {
+    background-color: #000000;
+    font-family: 'DotGothic16', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.game-container {
+    width: 900px;
+    margin: 0 auto;
+    padding-top: 0px;
+    position: relative;
+}
+
+h1 {
+    text-align: center;
+    font-size: 100px;
+    color: #d8a024;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-shadow: 4px 4px 0px #000, 8px 8px 0px #e43444;
+}
+
+h2 {
+    text-align: center;
+    font-size: 64px;
+    color: #1136ca;
+    margin-top: 0;
+    margin-bottom: 50px;
+    text-shadow: 4px 4px 0px #000, 8px 8px 0px #e43444;
+}
+
+.modeselect {
+    color: #ffffff;
+    text-align: center;
+    font-size: 35px;
+}
+
+.mode-case {
+    position: relative;
+    text-align: center;
+    margin-top: 30px;
+    display: inline-flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.mode-case button {
+    color: #000000;
+    background-color: #ffffff;
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 25px;
+    cursor: pointer;
+    padding: 10px 25px;
+    margin: 0 8px;
+    width: 115px;
+    border: 3px solid #000;
+    box-sizing: border-box;
+}
+
+.mode-case button:hover#mode1 {
+    color: #ffffff;
+    background-color: #e43444;
+    border-color: #ffffff;
+}
+
+/* 開発中ラベルの調整 */
+.dev-lock-overlay {
+    position: absolute;
+    top: -3px;
+    right: 190px;
+    width: 385px;
+    height: 60px;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 4px;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    pointer-events: none;
+    border: 2px dashed #555;
+}
+
+.dev-lock-text {
+    color: #ff0033;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 8px;
+    text-shadow: 0 0 10px #000;
+    white-space: nowrap;
+}
+
+#opening_screen {
+    display: none;
+    margin-top: 30px;
+}
+
+.opening-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    width: 900px;
+    margin: 0 auto;
+    padding-top: 30px;
+}
+
+.opening-txt {
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 300px;
+    text-shadow: 4px 4px 0px #000;
+}
+
+.left-text {
+    color: #e43444;
+    animation: fly-left 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.right-text {
+    color: #e43444;
+    animation: fly-right 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.center-text {
+    color: #ffff00;
+    position: absolute;
+    opacity: 0;
+    animation: flash-appear 2.8s ease-in-out forwards;
+}
+
+@keyframes fly-left {
+    0%   { transform: scale(0); opacity: 0; }
+    15%  { transform: scale(1.3); opacity: 1; }
+    20%  { transform: scale(1); }
+    60%  { transform: scale(1) translateX(0); opacity: 1; }
+    100% { transform: translateX(-400px) scale(0.6); opacity: 0; }
+}
+
+@keyframes fly-right {
+    0%   { transform: scale(0); opacity: 0; }
+    15%  { transform: scale(0); opacity: 0; }
+    35%  { transform: scale(1.3); opacity: 1; }
+    40%  { transform: scale(1); }
+    60%  { transform: scale(1) translateX(0); opacity: 1; }
+    100% { transform: translateX(400px) scale(0.6); opacity: 0; }
+}
+
+@keyframes flash-appear {
+    0%, 63% { opacity: 0; transform: scale(3); }
+    71%     { opacity: 1; transform: scale(0.8); }
+    72%, 87% { opacity: 1; transform: scale(1); }
+    90%     { opacity: 0; }
+    92%     { opacity: 1; transform: scale(1); }
+    94%     { opacity: 0; }
+    100%    { opacity: 1; transform: scale(1); }
+}
+
+#game-screen {
+    color: #fff;
+    padding: 5px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.enemy-side {
+    border: 2px dashed #444;
+    padding: 10px;
+    background-color: rgba(255, 0, 0, 0.05);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 125px;
+}
+
+.enemy-left-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.mode-display { font-size: 24px; }
+
+.status-gauge-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.gauge-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.gauge-label {
+    font-size: 18px;
+    width: 40px;
+    text-align: left;
+}
+
+.enemy-cards-zone {
+    display: flex;
+    gap: 15px;
+}
+
+.card-slot, .enemy-deck-bundle {
+    width: 80px;
+    height: 112px;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    background-size: cover;
+    background-position: center;
+    color: transparent;
+}
+
+.enemy-deck-bundle {
+    background-image: url('../img/Janken_Oh/ura.png');
+    box-shadow: 
+        3px 3px 0px #000,
+        -5px 5px 0px #fff, 
+        -2px 8px 0px #000,
+        -10px 10px 0px #fff, 
+        -7px 13px 0px #000;
+    transform: translate(-8px, -6px);
+}
+
+.gauge-border, .gauge-frame {
+    width: 200px;
+    height: 16px;
+    border: 3px solid #ffffff;
+    background-color: #000000;
+    padding: 2px;
+    box-shadow: 2px 2px 0px #000;
+}
+
+.gauge-bar {
+    height: 100%;
+    box-shadow: inset 0 0 3px rgba(0,0,0,0.5);
+    transition: width 0.3s ease-out;
+}
+
+.bar-hp { background-color: #00ff00; }
+.bar-jan { background-color: #ffcc00; }
+
+.enemy-hands, .player-hands {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.cpu-hand-btn, .my-hand-btn {
+    width: 80px;
+    height: 50px;
+    font-size: 50px;
+    background-color: #ffffff;
+    border: 3px solid #000000;
+    border-radius: 4px;
+    box-shadow: 2px 2px 0px #888;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.player-side {
+    border: 2px dashed #444;
+    padding: 10px;
+    background-color: rgba(0, 255, 0, 0.05);
+    border-radius: 8px;
+    margin-bottom: 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 125px;
+}
+
+.player-deck-zone {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.deck-bundle {
+    width: 80px;
+    height: 110px;
+    background-image: url('../img/Janken_Oh/ura.png');
+    background-size: cover;
+    background-position: center;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow:
+        3px 3px 0px #000,
+        -5px 4px 0px #fff, 
+        -1px 8px 0px #000,
+        -10px 10px 0px #fff, 
+        -7px 13px 0px #000;
+    transform: translate(16px, 1px);
+    transition: opacity 0.2s;
+}
+
+.player-cards-zone {
+    display: flex;
+    gap: 15px;
+}
+
+.player-cards-zone .card-slot {
+    width: 80px;
+    height: 110px;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.message-zone {
+    text-align: center;
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+#game-message {
+    color: #ffff00;
+    font-size: 24px;
+    margin: 0;
+    width: 600px;
+    padding: 12px 20px;
+    background-color: #000000;
+    border: 4px double #ffffff;
+    border-radius: 8px;
+    box-shadow: 4px 4px 0px #000;
+    text-align: left;
+    display: inline-block;
+}
+
+.hand-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.my-hand-btn.active {
+    background-color: #ffff00;
+    border-color: #ffaa00;
+    box-shadow: 0 0 20px #ffff00, 2px 2px 0px #000;
+    transform: scale(1.1);
+    animation: bowanGlow 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes bowanGlow {
+    0%   { box-shadow: 0 0 10px #ffff00, 2px 2px 0px #000; }
+    100% { box-shadow: 0 0 30px #ffcc00, 2px 2px 0px #000; }
+}
+
+.cpu-hand-btn.active {
+    background-color: #ffff00;
+    border-color: #ffaa00;
+    box-shadow: 0 0 20px #ffff00, 2px 2px 0px #000;
+    transform: scale(1.1);
+    animation: enemyBowanGlow 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes enemyBowanGlow {
+    0%   { box-shadow: 0 0 10px #ff3333, 2px 2px 0px #000; }
+    100% { box-shadow: 0 0 30px #ff6666, 2px 2px 0px #000; }
+}
+
+#card-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.popup-content {
+    position: relative;
+    text-align: center;
+    animation: popupShow 0.25s ease-out forwards;
+}
+
+#popup-img {
+    width: 320px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow:
+        0 0 20px 5px rgba(255, 255, 255, 0.9),  
+        0 0 40px 15px rgba(255, 255, 255, 0.4);
+}
+
+.popup-close-text {
+    color: #fff;
+    font-size: 20px;
+    margin-top: 15px;
+    text-shadow: 2px 2px 0px #000;
+    animation: text-blink 1s step-end infinite;
+}
+
+@keyframes popupShow {
+    0%   { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+#use-card-btn {
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 20px;
+    padding: 10px 25px;
+    background-color: #ffaa00;
+    color: #000;
+    border: 3px solid #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #000;
+    font-weight: bold;
+}
+
+#use-card-btn:hover {
+    background-color: #ffff00;
+    transform: scale(1.05);
+}
+
+.battle-zone {
+    margin: 15px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    height: auto;
+    min-height: 200px;
+    border: 2px dashed #444;
+    padding: 10px 5px;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.battle-card-slot {
+    width: 120px;
+    height: 165px;
+    border: 2px dashed #444;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hands-center-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.my-hand-btn:focus {
+    outline: none;
+    border: 3px solid #ef0b0b !important;
+    box-shadow: 
+        0 0 10px #fff, 
+        0 0 20px #ee6700, 
+        0 0 40px #ff4d00, 
+        2px 2px 0px #000 !important;
+    transform: scale(1.15) !important;
+}
+
+.slot-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+.battle-status-box {
+    width: 90px;
+    color: #ffffff;
+    text-shadow: 2px 2px 0px #000;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.player-side .battle-status-box { margin-right: 12px; }
+.enemy-side .battle-status-box { margin-left: 12px; }
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.status-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #b0b0b0;
+    letter-spacing: 1px;
+}
+
+.status-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffff00;
+}
+
+.status-element-bonus {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.damage-zone-left {
+    left: -50px !important;
+}
+.damage-zone-right {
+    right: -50px !important;
+    left: auto !important;
+}
+
+@keyframes enemy-pikopiko-glow {
+    0%   { box-shadow: 0 0 5px #ff3333, inset 0 0 5px #ff3333; background-color: #880000; }
+    50%  { box-shadow: 0 0 25px #ff6666, inset 0 0 15px #ff6666; background-color: #ff3333; }
+    100% { box-shadow: 0 0 5px #ff3333, inset 0 0 5px #ff3333; background-color: #880000; }
+}
+
+.enemy-pikopiko-active {
+    animation: enemy-pikopiko-glow 0.8s infinite ease-in-out !important;
+    border: 3px solid #ff9999 !important;
+}
+
+@keyframes aura-float-02 {
+    0%   { box-shadow: 0 0 10px #00d2ff, inset 0 0 4px #00d2ff; }
+    100% { box-shadow: 0 0 25px #0066ff, inset 0 0 10px #0066ff; }
+}
+.aura-02 {
+    animation: aura-float-02 1.2s infinite alternate ease-in-out !important;
+    border: 2px solid #00d2ff !important;
+}
+
+.sc-KO-container {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 30000; background-color: rgba(0,0,0,0.5);
+    display: flex; justify-content: center; align-items: center;
+    font-family: 'DotGothic16', sans-serif; pointer-events: auto; cursor: pointer;
+}
+.sc-KO-text {
+    font-size: 140px; font-weight: bold; text-align: center;
+    animation: sc-KO-flash 0.3s steps(2) infinite alternate;
+}
+.sc-WIN {
+    color: #ff2200;
+    text-shadow: 5px 5px 0px #000, 0 0 30px #ff5500;
+}
+.sc-LOSE {
+    color: #0088ff;
+    text-shadow: 5px 5px 0px #000, 0 0 30px #0000ff;
+}
+@keyframes sc-KO-flash {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.03); }
+}
