@@ -27,8 +27,11 @@ https://haretane.github.io/kadai_02/
 
 提出直前にレイアウトが崩れてしまい、泣きそうだった😭
 （まだ元に戻しきれていない）→修正できました！
+
+
 また、GitHubでデプロイしたところ、画像のリンクが外れてしまったようなので原因を究明中、、、、
 →解決しました！「ブランチの分岐（divergent branches）」とやらいうエラーがでていました。
+
 
 カード一覧：
 <img width="649" height="647" alt="image" src="https://github.com/user-attachments/assets/3e32f1d1-f853-4949-b5f0-8ed97b8f702a" />
